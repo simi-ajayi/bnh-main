@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BNH Portfolio Intelligence
 
-## Getting Started
+A focused Next.js application for monthly portfolio reporting, CoS-level visibility, agentic compliance monitoring, and controlled governance document generation.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 16 App Router and Node.js 22+
+- Tailwind CSS 4 and Lucide React
+- Neon PostgreSQL through the serverless HTTP driver
+- Password hashes with bcrypt and signed, HTTP-only JWT sessions
+- OpenAI Responses API for governance drafts
+
+## Run locally
+
+1. Install dependencies: `npm install`
+2. Copy `.env.example` to `.env.local` and add the server-only values.
+3. Create/seed the database: `npm run db:setup`
+4. Start the app: `npm run dev`
+5. Open `http://localhost:3000` (or the port printed by Next.js).
+
+Required environment variables:
+
+```text
+DATABASE_URL=
+SESSION_SECRET=
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-6-luna
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Never commit `.env.local`. The repository ignores it by default.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Seeded logins
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Role | Email | Password |
+| --- | --- | --- |
+| Superadmin | `superadmin@bnh.group` | `BNH@Super2026!` |
+| Admin | `admin@bnh.group` | `BNH@Admin2026!` |
+| Portfolio manager | `pm@bnh.group` | `BNH@User2026!` |
 
-## Learn More
+Passwords are stored as bcrypt hashes in PostgreSQL. The visible quick-login credentials are assessment-only and must be removed before a real rollout.
 
-To learn more about Next.js, take a look at the following resources:
+## Seed data
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`npm run db:setup` is idempotent and seeds five portfolios, the three accounts above, and four September 2026 monthly updates. The missing Vantage Retail submission is intentional so the compliance monitor demonstrates a missing-submission breach. Everything created after setup—new updates, compliance runs, and overrides—is live PostgreSQL data.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Assessment scenarios
 
-## Deploy on Vercel
+- Scenario A: persisted monthly submission form, aggregated dashboard, server validation, and role-based access.
+- Scenario B: deterministic PostgreSQL-backed compliance loop, deadline/tolerance evaluation, prepared actions, persisted findings, and human override. The one-page design is in `docs/agent-design.md`.
+- Scenario C: complete governance system prompt, Role Mandate and Board Note structures, design rationale, sample input/output, and a live OpenAI-backed generator. The written deliverable is in `docs/governance-system-prompt.md`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy to Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Import the repository, select Node.js 22 or newer, and add `DATABASE_URL`, `SESSION_SECRET`, `OPENAI_API_KEY`, and `OPENAI_MODEL` as environment variables. The supplied Neon database is already initialized; a different database should be prepared once with `npm run db:setup` before deployment.
+
+ChatGPT subscriptions and API billing are separate. Live governance generation requires available credit on the OpenAI API project associated with `OPENAI_API_KEY`.
